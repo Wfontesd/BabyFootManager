@@ -1,0 +1,163 @@
+/* -- CSS POUR LA PAGE -- */
+.container {
+  margin-left: 5%;
+  diplay: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 600px;
+}
+.partiesdiv,
+.envoieMessage {
+  display: flex;
+}
+.parties,
+.tchat {
+  display: float;
+  float: left;
+  padding: 10px;
+  margin: 10px;
+  border: 2px solid #3dd3e9;
+  width: 90%;
+  border-radius: 5px;
+}
+
+/* -- CSS POUR LES PARTIES -- */
+
+table {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  margin-top: 25px;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #1e90ff;
+  color: white;
+}
+.button,
+.inputNouvellePartie {
+  color: grey;
+  padding: 16px 32px;
+  text-align: center;
+  text-decoration: none;
+  transition-duration: 0.4s;
+  font-size: 16px;
+  margin: 4px 2px;
+  width: 100%;
+}
+.boutonCreerPartie {
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+.boutonCreerPartie:hover {
+  background-color: #00008b;
+  color: white;
+}
+.supprIcon {
+  background: url("trash3.png") left center no-repeat;
+  padding-left: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.terminerIcon {
+  background: url("checkmark.png") left center no-repeat;
+  padding-left: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.partieEnCoursIcon {
+  background: url("partieEnCours.png") left center no-repeat;
+  padding-left: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.partieFinieIcon {
+  background: url("partieFinie.png") left center no-repeat;
+  padding-left: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.boutonAction {
+  width: 50px;
+  height: 35px;
+  border: none;
+  background-color: white;
+}
+
+.compteurPartie {
+  width: 50px;
+  position: relative;
+  left: 9px;
+  float: right;
+  top: -25px;
+  color: white;
+  background-color: #1e90ff;
+  border: 2px solid black;
+  border-radius: 5px;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* -- CSS POUR LE TCHAT -- */
+
+.zoneDeTexte {
+  padding: 25px;
+  height: 200px;
+  background-color: #f1f1f1;
+  margin-bottom: 30px;
+  overflow-y: auto;
+}
+.inputPseudo {
+  color: grey;
+  padding: 8px 8px;
+  text-align: left;
+  text-decoration: none;
+  font-size: 16px;
+  width: 30%;
+  margin-right: 10px;
+  text-transform: capitalize;
+}
+.inputMessage {
+  color: grey;
+  padding: 8px 8px;
+  text-align: left;
+  text-decoration: none;
+  font-size: 16px;
+  width: 90%;
+  margin-right: 10px;
+}
+
+.boutonEnvoyer {
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 20%;
+}
+.boutonEnvoyer:hover {
+  background-color: #00008b;
+  color: white;
+}
+.pseudoZoneDeTexte {
+  color: #1e90ff;
+  font-weight: bold;
+  text-transform: capitalize;
+  font-family: Verdana, Geneva, sans-serif;
+}
+.messageZoneDeTexte {
+  font-weight: normal;
+  color: black;
+  text-transform: none;
+}

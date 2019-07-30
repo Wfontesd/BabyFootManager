@@ -1,0 +1,204 @@
+<%include header.ejs %>
+<div class="container">
+	<div class="parties">
+		<%# Bloc supérieur du gestionnaire de partie
+		permettant la création d'une nouvelle partie %>
+			<div class="partiesdiv">
+			<input type="text" class="inputNouvellePartie" name="unNomPartie" id="unNomPartie" placeholder="Nouvelle partie ...">
+			<%# Appel à la fonction de création d'une partie avec comme paramètre la valeur de l'input "unNomPartie" %>
+			<button class="button boutonCreerPartie" onClick="nouvellePartie(document.getElementById('unNomPartie').value)"> Créer Partie </button>
+			</div>
+			<div class="partiesdiv">
+				<%# Table retournant l'ensemble des parties (en cours ou non) %>
+				<table id="tableParties">
+					<tr>
+						<th>Nom Partie</th>
+						<th>Etat de la partie</th>
+						<%# Le compteur de parties en cours est rajouté et est repositionné par le CSS %>
+						<th>Gestion de la partie 	<div class="compteurPartie" id = "compteurPartie"> <%= compteurParties %> </div></th>
+					</tr>
+					<% parties.forEach((partie,index) => { %>
+					<tr>
+						<td name="nomPartie" id="nomPartie"><%=partie.nompartie%></td>
+						<%# Lors du premier affichage de la page, si la partie est terminée
+						alors on attribue à sa deuxième cellule une classe spécifique définie en CSS
+						ainsi qu'un seul bouton permettant de supprimer la partie %>
+						<%if (partie.partiefinie == true) { %>
+							<td name="etatPartie" id="etatPartie"><i class="partieFinieIcon"></i></td>
+							<td>
+								<%# on récupère ici l'identifiant de la partie ainsi que la ligne de la table afin de pouvoir la supprimer
+								dynamiquement chez chaque client, la même méthode est utilisée pour terminer une partie %>
+								<button class="boutonAction" onClick="supprimerPartie(<%=partie.partie_id%>,this)"><i class="supprIcon"></i></button>
+							</td>
+							<%# Si la partie n'est pas terminée on attribue une classe spécifique à sa deuxième cellule
+							ainsi que deux boutons permettant soit de terminer la partie, soit de la supprimer %>
+							<% }else{ %>
+								<td name="etatPartie" id="etatPartie"><i class="partieEnCoursIcon"></i></td><td>
+									<button class="boutonAction" onClick="terminerPartie(<%=partie.partie_id%>,this)"><i class="terminerIcon"></i></button>
+									<button class="boutonAction" onClick="supprimerPartie(<%=partie.partie_id%>,this)"><i class="supprIcon"></i></button>
+								</td>
+								<% } %>
+					</tr>
+					<% }) %>
+				</table>
+			</div>
+	</div>
+	<div class="tchat">
+		<%# Bloc définissant la zone ou les messages des utilisateurs seront envoyés %>
+		<div class="zoneDeTexte" id="zoneDeTexte">
+			<p><strong> Vous êtes connecté au tchat. </strong></p>
+		</div>
+		<%# Bloc permettant l'envoie d'un message, le pseudonyme et le message de
+		l'utilisateur sont récupérés à travers les input "unPseudo" et "unMessage" %>
+		<div class="envoieMessage">
+			<input type="text" class="inputPseudo" name="unPseudo" id="unPseudo" placeholder="Votre pseudonyme" maxlength="25">
+			<input type="text" class="inputMessage" name="unMessage" id="unMessage" placeholder="Saisissez votre message ..." maxlength="100">
+			<button class="button boutonEnvoyer" onClick="envoieMessage(document.getElementById('unMessage').value,document.getElementById('unPseudo').value)"> Envoyer </button>
+		</div>
+	</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+<%# On stocke la valeur du compteur au premier affichage de la page %>
+var compteur = <%= compteurParties %>;
+const socket = io.connect();
+<%# Si réception d'un message 'changes' %>
+socket.on('changes',function(data){
+	let maTable = document.getElementById('tableParties');
+	<%# Chaque objet "data" comporte un type, on effectue un traitement différent
+	pour chaque type %>
+	switch(data.type){
+		<%# Le type "Create" va nous indiquer qu'il faut insérer une nouvelle ligne
+		dans la table des parties %>
+		case "Create":
+			<%# La ligne qui sera ajouter sera mise en bas de table %>
+			let newRow = maTable.insertRow(-1);
+			let celluleNomPartie = newRow.insertCell(0);
+			let celluleEtatPartie = newRow.insertCell(1);
+			let celluleGestionPartie = newRow.insertCell(2);
+			celluleNomPartie.innerHTML = data.data.nom;
+			celluleEtatPartie.innerHTML = "<i class="+"partieEnCoursIcon"+"></i>";
+			celluleGestionPartie.innerHTML = "<button class="+"boutonAction"+" onClick=terminerPartie("
+			+data.data.partie_id
+			+",this)><i class="+"terminerIcon"+"></i></button>"
+			+" <button class="+"boutonAction"+" onClick=supprimerPartie("
+			+data.data.partie_id
+			+",this)><i class="+"supprIcon"+"></i></button>";
+		  <%# On actualise le compteur %>
+			compteur = compteur + 1;
+		  document.getElementById("compteurPartie").innerHTML = compteur;
+		break;
+		<%# Le type "Update" va nous indiquer qu'il faut changer l'état d'une partie
+		dans la table des parties %>
+		case "Update":
+			let rowToUpdate = maTable.rows[data.data.partieIndex].cells;
+			rowToUpdate[1].innerHTML = "<i class="+"partieFinieIcon"+"></i>";
+			rowToUpdate[2].innerHTML = "<button class="+"boutonAction"+" onClick=supprimerPartie("
+			+data.data.partie_id
+			+",this)><i class="+"supprIcon"+"></i></button>"
+			compteur = compteur - 1;
+		  document.getElementById("compteurPartie").innerHTML=compteur;
+		break;
+		<%# Le type "Delete" va nous indiquer qu'il faut supprimer une partie de la table
+		des parties %>
+		case "Delete":
+			let rowSelected = maTable.rows[data.data.partieIndex].cells;
+			<%# On verifie si la partie était en cours
+			Si elle l'était alors on enlève 1 au compteur puis on la supprime de la table des
+			parties
+			Sinon on la supprime seulement de la table des parties%>
+			if(rowSelected[1].innerHTML == "<i class="+"\"partieEnCoursIcon\""+"></i>"){
+				compteur = compteur - 1;
+				document.getElementById("compteurPartie").innerHTML= compteur;
+			}
+			maTable.deleteRow(data.data.partieIndex);
+		break;
+		<%# Le type "Message" va nous indiquer qu'il faut rajouter le message contenu
+		dans l'objet "data" %>
+    case "Message":
+			<%# On créer un élément "paragraphe" auquel on ajoute une classe
+			ainsi qu'un texte comportant le pseudonyme de la personne qui a envoyer le message %>
+			let pseudo = document.createElement("p");
+			let pseudoContent = document.createTextNode(data.data.pseudo+" : ");
+			pseudo.classList.add("pseudoZoneDeTexte");
+	    pseudo.appendChild(pseudoContent);
+			<%# On créer un élément "span" dans lequel
+			sera stocké le contenu du message envoyé %>
+			let message = document.createElement("span");
+			let messageContent = document.createTextNode(data.data.message);
+			message.classList.add("messageZoneDeTexte");
+			message.appendChild(messageContent);
+			<%# On ajoute l'élément "span" créer précédement dans l'élément "paragraphe"
+			créer %>
+			pseudo.append(message);
+			<%# On ajoute l'élement "paragraphe" à l'élément "zoneDeTexte" du Tchat %>
+			document.getElementById("zoneDeTexte").appendChild(pseudo);
+		break;
+
+		default:
+			console.log("Mauvais type");
+		break;
+	}
+
+});
+<%# Fonction permettant la création d'une partie %>
+function nouvellePartie(nomPartie){
+	let req = new XMLHttpRequest();
+	<%# On vérifie que le nom de la partie ne soit pas vide %>
+	if(nomPartie.trim() !=""){
+		let url = "http://localhost:8080/partie/"+nomPartie;
+		<%# On ouvre une requete de type POST puis on l'envoie avec le nom de la partie
+		en paramètre dans l'URL %>
+		req.open('POST',url,false);
+		req.send();
+	}else{
+		alert("Saisissez un nom de partie");
+	}
+
+};
+
+<%# Fonction permettant l'envoie de messages dans le Tchat %>
+function envoieMessage(message,pseudo){
+	let req = new XMLHttpRequest();
+	<%# On vérifie que le message et le pseudonyme ne soient pas vides %>
+	if(message.trim() != "" && pseudo.trim() != ""  ){
+		<%# On ouvre une requete de type POST puis on l'envoie avec le pseudonyme
+		et le message en paramètres dans l'URL %>
+		let url = "http://localhost:8080/partie/tchat/"+pseudo+"/"+message;
+		req.open('POST',url,false);
+		req.send();
+	}else{
+		alert("Saisissez un pseudo et un message");
+	}
+
+};
+<%# Fonction permettant de changer l'état d'une partie en "finie" %>
+function terminerPartie(id,ligneTableHTML){
+	<%# On récupère l'index de la partie à terminer afin que les autres clients
+	puissent modifier la même partie %>
+	let indexTablePartie = ligneTableHTML.parentNode.parentNode.rowIndex;
+	let req = new XMLHttpRequest();
+	let url = "http://localhost:8080/partie/"+id+"/"+indexTablePartie;
+	<%# On ouvre une requete de type PUT puis on l'envoie avec l'index de la partie dans la table
+	et son identifiant en paramètres dans l'URL %>
+	req.open('PUT',url,false);
+	req.send();
+};
+
+function supprimerPartie(id,ligneTableHTML){
+	<%# On récupère l'index de la partie à supprimer afin que les autres clients
+	puissent supprimer la même partie %>
+	let indexTablePartie = ligneTableHTML.parentNode.parentNode.rowIndex;
+	let req = new XMLHttpRequest();
+	let url = "http://localhost:8080/partie/"+id+"/"+indexTablePartie;
+	<%# On ouvre une requete de type DELETE puis on l'envoie avec l'index de la partie dans la table
+	et son identifiant en paramètres dans l'URL %>
+	req.open('DELETE',url,false);
+	req.send();
+};
+
+</script>
+
+</body>
+</html>
