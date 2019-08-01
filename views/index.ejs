@@ -61,7 +61,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 <%# On stocke la valeur du compteur au premier affichage de la page %>
-var compteur = <%= compteurParties %>;
+const compteur = <%= compteurParties %>;
 const socket = io.connect();
 <%# Si réception d'un message 'changes' %>
 socket.on('changes',function(data){
@@ -73,10 +73,10 @@ socket.on('changes',function(data){
 		dans la table des parties %>
 		case "Create":
 			<%# La ligne qui sera ajouter sera mise en bas de table %>
-			let newRow = maTable.insertRow(-1);
-			let celluleNomPartie = newRow.insertCell(0);
-			let celluleEtatPartie = newRow.insertCell(1);
-			let celluleGestionPartie = newRow.insertCell(2);
+			const newRow = maTable.insertRow(-1);
+			const celluleNomPartie = newRow.insertCell(0);
+			const celluleEtatPartie = newRow.insertCell(1);
+			const celluleGestionPartie = newRow.insertCell(2);
 			celluleNomPartie.innerHTML = data.data.nom;
 			celluleEtatPartie.innerHTML = "<i class="+"partieEnCoursIcon"+"></i>";
 			celluleGestionPartie.innerHTML = "<button class="+"boutonAction"+" onClick=terminerPartie("
@@ -92,7 +92,7 @@ socket.on('changes',function(data){
 		<%# Le type "Update" va nous indiquer qu'il faut changer l'état d'une partie
 		dans la table des parties %>
 		case "Update":
-			let rowToUpdate = maTable.rows[data.data.partieIndex].cells;
+			const rowToUpdate = maTable.rows[data.data.partieIndex].cells;
 			rowToUpdate[1].innerHTML = "<i class="+"partieFinieIcon"+"></i>";
 			rowToUpdate[2].innerHTML = "<button class="+"boutonAction"+" onClick=supprimerPartie("
 			+data.data.partie_id
@@ -103,7 +103,7 @@ socket.on('changes',function(data){
 		<%# Le type "Delete" va nous indiquer qu'il faut supprimer une partie de la table
 		des parties %>
 		case "Delete":
-			let rowSelected = maTable.rows[data.data.partieIndex].cells;
+			const rowSelected = maTable.rows[data.data.partieIndex].cells;
 			<%# On verifie si la partie était en cours
 			Si elle l'était alors on enlève 1 au compteur puis on la supprime de la table des
 			parties
@@ -119,14 +119,14 @@ socket.on('changes',function(data){
     case "Message":
 			<%# On créer un élément "paragraphe" auquel on ajoute une classe
 			ainsi qu'un texte comportant le pseudonyme de la personne qui a envoyer le message %>
-			let pseudo = document.createElement("p");
-			let pseudoContent = document.createTextNode(data.data.pseudo+" : ");
+			const pseudo = document.createElement("p");
+			const pseudoContent = document.createTextNode(data.data.pseudo+" : ");
 			pseudo.classList.add("pseudoZoneDeTexte");
 	    pseudo.appendChild(pseudoContent);
 			<%# On créer un élément "span" dans lequel
 			sera stocké le contenu du message envoyé %>
-			let message = document.createElement("span");
-			let messageContent = document.createTextNode(data.data.message);
+			const message = document.createElement("span");
+			const messageContent = document.createTextNode(data.data.message);
 			message.classList.add("messageZoneDeTexte");
 			message.appendChild(messageContent);
 			<%# On ajoute l'élément "span" créer précédement dans l'élément "paragraphe"
@@ -144,10 +144,10 @@ socket.on('changes',function(data){
 });
 <%# Fonction permettant la création d'une partie %>
 function nouvellePartie(nomPartie){
-	let req = new XMLHttpRequest();
+	const req = new XMLHttpRequest();
 	<%# On vérifie que le nom de la partie ne soit pas vide %>
 	if(nomPartie.trim() !=""){
-		let url = "http://localhost:8080/partie/"+nomPartie;
+		const url = "http://localhost:8080/partie/"+nomPartie;
 		<%# On ouvre une requete de type POST puis on l'envoie avec le nom de la partie
 		en paramètre dans l'URL %>
 		req.open('POST',url,false);
@@ -160,12 +160,12 @@ function nouvellePartie(nomPartie){
 
 <%# Fonction permettant l'envoie de messages dans le Tchat %>
 function envoieMessage(message,pseudo){
-	let req = new XMLHttpRequest();
+	const req = new XMLHttpRequest();
 	<%# On vérifie que le message et le pseudonyme ne soient pas vides %>
 	if(message.trim() != "" && pseudo.trim() != ""  ){
 		<%# On ouvre une requete de type POST puis on l'envoie avec le pseudonyme
 		et le message en paramètres dans l'URL %>
-		let url = "http://localhost:8080/partie/tchat/"+pseudo+"/"+message;
+		const url = "http://localhost:8080/partie/tchat/"+pseudo+"/"+message;
 		req.open('POST',url,false);
 		req.send();
 	}else{
@@ -177,9 +177,9 @@ function envoieMessage(message,pseudo){
 function terminerPartie(id,ligneTableHTML){
 	<%# On récupère l'index de la partie à terminer afin que les autres clients
 	puissent modifier la même partie %>
-	let indexTablePartie = ligneTableHTML.parentNode.parentNode.rowIndex;
-	let req = new XMLHttpRequest();
-	let url = "http://localhost:8080/partie/"+id+"/"+indexTablePartie;
+	const indexTablePartie = ligneTableHTML.parentNode.parentNode.rowIndex;
+	const req = new XMLHttpRequest();
+	const url = "http://localhost:8080/partie/"+id+"/"+indexTablePartie;
 	<%# On ouvre une requete de type PUT puis on l'envoie avec l'index de la partie dans la table
 	et son identifiant en paramètres dans l'URL %>
 	req.open('PUT',url,false);
@@ -189,9 +189,9 @@ function terminerPartie(id,ligneTableHTML){
 function supprimerPartie(id,ligneTableHTML){
 	<%# On récupère l'index de la partie à supprimer afin que les autres clients
 	puissent supprimer la même partie %>
-	let indexTablePartie = ligneTableHTML.parentNode.parentNode.rowIndex;
-	let req = new XMLHttpRequest();
-	let url = "http://localhost:8080/partie/"+id+"/"+indexTablePartie;
+	const indexTablePartie = ligneTableHTML.parentNode.parentNode.rowIndex;
+	const req = new XMLHttpRequest();
+	const url = "http://localhost:8080/partie/"+id+"/"+indexTablePartie;
 	<%# On ouvre une requete de type DELETE puis on l'envoie avec l'index de la partie dans la table
 	et son identifiant en paramètres dans l'URL %>
 	req.open('DELETE',url,false);
