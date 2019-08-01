@@ -65,7 +65,7 @@ const compteur = <%= compteurParties %>;
 const socket = io.connect();
 <%# Si réception d'un message 'changes' %>
 socket.on('changes',function(data){
-	let maTable = document.getElementById('tableParties');
+	const maTable = document.getElementById('tableParties');
 	<%# Chaque objet "data" comporte un type, on effectue un traitement différent
 	pour chaque type %>
 	switch(data.type){
