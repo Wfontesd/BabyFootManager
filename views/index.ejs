@@ -61,7 +61,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 <%# On stocke la valeur du compteur au premier affichage de la page %>
-const compteur = <%= compteurParties %>;
+let compteur = <%= compteurParties %>;
 const socket = io.connect();
 <%# Si réception d'un message 'changes' %>
 socket.on('changes',function(data){
