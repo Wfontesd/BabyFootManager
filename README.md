@@ -48,6 +48,7 @@ const configuration = {
 Ouvrez un invite de commande dans le dossier de l'application et exécutez la ligne suivante 
 
 ```
+npm install
 npm run start
 ```
 
