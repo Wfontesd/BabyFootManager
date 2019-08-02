@@ -1,7 +1,6 @@
 const express = require("express");
 const store = require("./store/sockets.js");
 const path = require("path");
-
 const app = express();
 const port = 8080;
 
