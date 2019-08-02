@@ -1,4 +1,4 @@
-const { pool } = require("../database.js");
+const { pool } = require("../db/database.js");
 module.exports = {
   pageAccueil: (req, res) => {
     let requete = "SELECT * FROM babyfootmanager.parties";
